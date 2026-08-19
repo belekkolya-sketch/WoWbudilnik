@@ -1,4 +1,4 @@
-## Interface: 30402
+## Interface: 30300
 ## Title: WoWbudilnik
 ## Notes: Простой независимый будильник поверх любых UI-модов.
 ## Author: Sinemoska
