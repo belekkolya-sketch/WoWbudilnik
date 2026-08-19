@@ -1,0 +1,8 @@
+## Interface: 30402
+## Title: WoWbudilnik
+## Notes: Простой независимый будильник поверх любых UI-модов.
+## Author: Sinemoska
+## Version: 0.1
+
+core.lua
+options.lua
