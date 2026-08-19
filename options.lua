@@ -9,9 +9,8 @@ local title = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 title:SetPoint("TOPLEFT", 16, -16)
 title:SetText("Будильник")
 
--- Функция сохранения базы данных
+-- Функция сохранения (заглушка)
 local function SaveDB()
-    -- Здесь позже будет запись значений из полей ввода в таблицу WoWbudilnikDB
 end
 
 -- Поле ввода времени
@@ -19,22 +18,34 @@ local timeBox = CreateFrame("EditBox", "WoWBudilnikTimeBox", panel, "InputBoxTem
 timeBox:SetSize(50, 20)
 timeBox:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -40)
 timeBox:SetAutoFocus(false)
-timeBox:SetNumeric(true)
+
 _G[timeBox:GetName() .. "Text"]:SetText("Насколько завести:")
 
--- Выпадающий список (Минуты/Часы) - заглушка для DropDownMenu
+-- Выпадающий список (Секунды/Минуты/Часы)
 local unitBox = CreateFrame("Button", "WoWBudilnikUnitBox", panel, "UIDropDownMenuTemplate")
 unitBox:SetPoint("TOPLEFT", timeBox, "TOPRIGHT", 10, -5)
+
 UIDropDownMenu_Initialize(unitBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
-    info.text = "Секунды"; info.func = function() UIDropDownMenu_SetSelectedID(unitBox, 1) end; info.arg1 = 1; UIDropDownMenu_AddButton(info)
-    info.text = "Минуты"; info.func = function() UIDropDownMenu_SetSelectedID(unitBox, 2) end; info.arg1 = 60; UIDropDownMenu_AddButton(info)
-    info.text = "Часы"; info.func = function() UIDropDownMenu_SetSelectedID(unitBox, 3) end; info.arg1 = 3600; UIDropDownMenu_AddButton(info)
+    info.text = "Секунды"
+    info.func = function() UIDropDownMenu_SetSelectedID(unitBox, 1) end
+    UIDropDownMenu_AddButton(info)
+
+    info = UIDropDownMenu_CreateInfo()
+    info.text = "Минуты"
+    info.func = function() UIDropDownMenu_SetSelectedID(unitBox, 2) end
+    UIDropDownMenu_AddButton(info)
+
+    info = UIDropDownMenu_CreateInfo()
+    info.text = "Часы"
+    info.func = function() UIDropDownMenu_SetSelectedID(unitBox, 3) end
+    UIDropDownMenu_AddButton(info)
 end)
+
 UIDropDownMenu_SetWidth(unitBox, 80)
 UIDropDownMenu_SetSelectedID(unitBox, 1)
 
--- Подсказка про лимит
+-- Подсказка
 local limitText = panel:CreateFontString(nil, "OVERLAY", "GameFontWhiteSmall")
 limitText:SetPoint("TOPLEFT", timeBox, "BOTTOMLEFT", 0, -5)
 limitText:SetText("(Максимум 600 минут или 10 часов)")
@@ -52,13 +63,20 @@ _G[screenCheck:GetName() .. "Text"]:SetText("Объявление на экра�
 -- Выпадающий список звуков
 local soundBox = CreateFrame("Button", "WoWBudilnikSoundBox", panel, "UIDropDownMenuTemplate")
 soundBox:SetPoint("TOPLEFT", screenCheck, "BOTTOMLEFT", 0, -15)
+
 UIDropDownMenu_Initialize(soundBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
-    info.text = "Стандартный звук"; info.func = function() UIDropDownMenu_SetSelectedID(soundBox, 1) end; UIDropDownMenu_AddButton(info)
-    info.text = "Звук битвы"; info.func = function() UIDropDownMenu_SetSelectedID(soundBox, 2) end; UIDropDownMenu_AddButton(info)
+    info.text = "Стандартный звук"
+    info.func = function() UIDropDownMenu_SetSelectedID(soundBox, 1) end
+    UIDropDownMenu_AddButton(info)
+
+    info = UIDropDownMenu_CreateInfo()
+    info.text = "Звук битвы"
+    info.func = function() UIDropDownMenu_SetSelectedID(soundBox, 2) end
+    UIDropDownMenu_AddButton(info)
 end)
+
 UIDropDownMenu_SetWidth(soundBox, 150)
 UIDropDownMenu_SetSelectedID(soundBox, 1)
-_G[soundBox:GetName() .. "Text"]:SetText("Звук оповещения:")
 
-print("|cFFFFD100[WoWbudilnik] |cFF00FF00Окно настроек загружено.|r")
+print("|cFFFFD100[WoWbudilnik]|r |cFF00FF00Окно настроек загружено.|r")
