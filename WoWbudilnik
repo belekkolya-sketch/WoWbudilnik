@@ -1,18 +1,31 @@
--- WoWbudilnik/core.lua - Версия 0.2 (Иконка + Ограничения)
+-- WoWbudilnik/core.lua - Версия 0.3 (ТЗ: Иконка + Лимиты + Настройки)
 
+-- База данных для сохранения координат кнопки
 if not WoWbudilnikDB then 
     WoWbudilnikDB = { x = 0, y = 0 } 
 end
 
 local ICON_PATH = "Interface\\Icons\\INV_Misc_PocketWatch_01"
-local MAX_MINUTES = 600 -- Лимит из ТЗ
+local MAX_MINUTES = 600 -- Лимит из ТЗ (10 часов)
 
+-- Функция срабатывания таймера
 local function AlarmTriggered()
     print("|cFFFFD100[WoWbudilnik] |cFFFFFF00Время вышло!|r")
-    PlaySound("RaidWarning") -- Временный стандартный громкий звук
+    
+    -- Проверка галочек из Options.lua (предварительная привязка)
+    if WoWBudilnikChatCheck and WoWBudilnikChatCheck:GetChecked() then
+        print("|cFFFFD100[WoWbudilnik] |cFF00FF00Сработал будильник!|r")
+    end
+    
+    if WoWBudilnikScreenCheck and WoWBudilnikScreenCheck:GetChecked() then
+        RaidNotice_AddMessage(RaidWarningFrame, "|cFFFF0000[WoWbudilnik] ВРЕМЯ ПРИШЛО!|r", ChatTypeInfo["RAID_WARNING"])
+    end
+    
+    -- Звук (заглушка, пока не прикрутили выбор в опциях)
+    PlaySound("RaidWarning") 
 end
 
--- Создание кнопки
+-- Создание основной кнопки-иконки
 local btn = CreateFrame("Button", "WoWBudilnikButton", UIParent)
 btn:SetSize(50, 50)
 btn:SetNormalTexture(ICON_PATH)
@@ -23,7 +36,7 @@ btn:SetMovable(true)
 btn:EnableMouse(true)
 btn:SetHighlightTexture(ICON_PATH) -- Эффект подсветки при наведении
 
--- Логика перетаскивания
+-- Логика перетаскивания (сохранение координат)
 btn:SetScript("OnDragStart", function(self) self:StartMoving() end)
 btn:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
@@ -32,14 +45,19 @@ btn:SetScript("OnDragStop", function(self)
     WoWbudilnikDB.y = math.floor(yOfs)
 end)
 
--- Открытие окна настроек (заглушка)
-btn:SetScript("OnClick", function()
-    StaticPopup_Show("WOwbudilnik_SET_TIMER")
+-- Открытие окна настроек по ПКМ или ЛКМ
+btn:SetScript("OnClick", function(self, button)
+    if button == "RightButton" or IsShiftKeyDown() then
+        InterfaceOptionsFrame_OpenToCategory("WoWbudilnik")
+        InterfaceOptionsFrame_OpenToCategory("WoWbudilnik") -- Двойной вызов для надежности
+    else
+        StaticPopup_Show("WOwbudilnik_SET_TIMER")
+    end
 end)
 
--- Всплывающее окно ввода времени (улучшенное)
+-- Всплывающее окно ввода времени (улучшенное под ТЗ)
 StaticPopupDialogs["WOwbudilnik_SET_TIMER"] = {
-    text = "Настройка будильника",
+    text = "Настройка будильника\n\nНасколько завести:",
     button1 = OKAY,
     button2 = CANCEL,
     hasEditBox = 1,
@@ -47,7 +65,7 @@ StaticPopupDialogs["WOwbudilnik_SET_TIMER"] = {
     whileDead = 1,
     hideOnEscape = 1,
     
-    OnShow = function(self, data)
+    OnShow = function(self)
         self.editBox:SetText("60")
     end,
     
@@ -68,5 +86,4 @@ StaticPopupDialogs["WOwbudilnik_SET_TIMER"] = {
     EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
 }
 
-print("|cFFFFD100[WoWbudilnik] |cFFAAAAAAЗагружен. Версия 0.2|r")
-options.lua
+print("|cFFFFD100[WoWbudilnik] |cFFAAAAAAЗагружен. Версия 0.3|r")
