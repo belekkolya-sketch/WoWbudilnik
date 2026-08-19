@@ -69,3 +69,4 @@ StaticPopupDialogs["WOwbudilnik_SET_TIMER"] = {
 }
 
 print("|cFFFFD100[WoWbudilnik] |cFFAAAAAAЗагружен. Версия 0.2|r")
+options.lua
