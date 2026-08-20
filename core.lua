@@ -1,4 +1,4 @@
--- WoWbudilnik/core.lua — рабочая версия для 3.3.5
+-- WoWbudilnik/core.lua — финальная версия с графикой, Esc и своим текстом
 
 if not WoWbudilnikDB then
     WoWbudilnikDB = { x = 0, y = 0, sound = 1, mode = 1, unit = 1 }
@@ -24,11 +24,15 @@ end
 -- =======================================================
 -- СРАБАТЫВАНИЕ
 -- =======================================================
-local function AlarmTriggered()
+local function AlarmTriggered(custom)
+    if not custom or custom == "" then
+        custom = "ВРЕМЯ ВЫШЛО!"
+    end
+
     if WoWbudilnikDB.mode == 1 then
-        print("|cFFFFD100[Будильник]|r |cFFFFFF00ВРЕМЯ ВЫШЛО!|r")
+        print("|cFFFFD100[Будильник]|r |cFFFFFF00" .. custom .. "|r")
     else
-        RaidNotice_AddMessage(RaidWarningFrame, "|cFFFF0000[Будильник] ВРЕМЯ ПРИШЛО!|r", { r = 1, g = 0, b = 0 })
+        RaidNotice_AddMessage(RaidWarningFrame, "|cFFFF0000[Будильник] " .. custom .. "|r", { r = 1, g = 0, b = 0 })
     end
 
     if WoWbudilnikDB.sound == 1 then
@@ -42,7 +46,7 @@ end
 -- ОКНО
 -- =======================================================
 local frame = CreateFrame("Frame", "WoWBudilnikFrame", UIParent)
-frame:SetSize(300, 260)
+frame:SetSize(320, 300)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("DIALOG")
 frame:SetMovable(true)
@@ -55,6 +59,9 @@ frame:SetBackdrop({
     insets = { left = 11, right = 12, top = 12, bottom = 11 }
 })
 frame:Hide()
+
+-- Закрытие по Esc
+tinsert(UISpecialFrames, "WoWBudilnikFrame")
 
 frame:SetScript("OnMouseDown", function(self, button)
     if button == "LeftButton" then
@@ -72,11 +79,11 @@ title:SetText("Будильник")
 
 -- Единицы времени
 local timeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-timeLabel:SetPoint("TOPLEFT", 16, -46)
-timeLabel:SetText("Выберите единицу времени:")
+timeLabel:SetPoint("TOPLEFT", 20, -50)
+timeLabel:SetText("Единицы:")
 
 local unitBox = CreateFrame("Button", "WoWBudilnikUnitBox", frame, "UIDropDownMenuTemplate")
-unitBox:SetPoint("TOPLEFT", timeLabel, "BOTTOMLEFT", 0, -5)
+unitBox:SetPoint("TOPLEFT", timeLabel, "BOTTOMLEFT", -10, -5)
 
 UIDropDownMenu_Initialize(unitBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
@@ -100,27 +107,27 @@ UIDropDownMenu_SetSelectedValue(unitBox, "Минуты")
 
 -- Поле ввода
 local inputLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-inputLabel:SetPoint("TOPLEFT", unitBox, "TOPRIGHT", 16, -8)
+inputLabel:SetPoint("TOPLEFT", unitBox, "TOPRIGHT", 20, -8)
 inputLabel:SetText("Время:")
 
 local inputBox = CreateFrame("EditBox", "WoWBudilnikInput", frame, "InputBoxTemplate")
-inputBox:SetSize(80, 24)
+inputBox:SetSize(70, 24)
 inputBox:SetPoint("TOPLEFT", inputLabel, "TOPRIGHT", 6, -2)
 inputBox:SetAutoFocus(false)
 inputBox:SetText("60")
 
 -- Подсказка
 local limitText = frame:CreateFontString(nil, "OVERLAY", "GameFontWhiteSmall")
-limitText:SetPoint("TOPLEFT", unitBox, "BOTTOMLEFT", 0, -8)
+limitText:SetPoint("TOPLEFT", unitBox, "BOTTOMLEFT", 0, -10)
 limitText:SetText("(Максимум 600 минут или 10 часов)")
 
 -- Тип оповещения
 local modeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-modeLabel:SetPoint("TOPLEFT", limitText, "BOTTOMLEFT", 0, -10)
+modeLabel:SetPoint("TOPLEFT", limitText, "BOTTOMLEFT", 0, -12)
 modeLabel:SetText("Тип оповещения:")
 
 local modeBox = CreateFrame("Button", "WoWBudilnikModeBox", frame, "UIDropDownMenuTemplate")
-modeBox:SetPoint("TOPLEFT", modeLabel, "BOTTOMLEFT", 0, -5)
+modeBox:SetPoint("TOPLEFT", modeLabel, "BOTTOMLEFT", -10, -5)
 
 UIDropDownMenu_Initialize(modeBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
@@ -144,11 +151,11 @@ UIDropDownMenu_SetSelectedValue(modeBox, "В чат")
 
 -- Звук
 local soundLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-soundLabel:SetPoint("TOPLEFT", modeBox, "BOTTOMLEFT", 0, -10)
+soundLabel:SetPoint("TOPLEFT", modeBox, "BOTTOMLEFT", 0, -8)
 soundLabel:SetText("Звук оповещения:")
 
 local soundBox = CreateFrame("Button", "WoWBudilnikSoundBox", frame, "UIDropDownMenuTemplate")
-soundBox:SetPoint("TOPLEFT", soundLabel, "BOTTOMLEFT", 0, -5)
+soundBox:SetPoint("TOPLEFT", soundLabel, "BOTTOMLEFT", -10, -5)
 
 UIDropDownMenu_Initialize(soundBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
@@ -170,10 +177,21 @@ end)
 UIDropDownMenu_SetWidth(soundBox, 160)
 UIDropDownMenu_SetSelectedValue(soundBox, "Стандартный звук")
 
+-- Поле своего текста
+local customLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
+customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 0, -10)
+customLabel:SetText("Текст при звонке:")
+
+local customBox = CreateFrame("EditBox", "WoWBudilnikCustomText", frame, "InputBoxTemplate")
+customBox:SetSize(180, 24)
+customBox:SetPoint("TOPLEFT", customLabel, "BOTTOMLEFT", 0, -5)
+customBox:SetAutoFocus(false)
+customBox:SetText("Проснись!")
+
 -- Кнопка "Завести"
 local startBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 startBtn:SetSize(120, 24)
-startBtn:SetPoint("BOTTOM", 0, 14)
+startBtn:SetPoint("BOTTOM", 0, 12)
 startBtn:SetText("Завести")
 
 startBtn:SetScript("OnClick", function()
@@ -199,9 +217,14 @@ startBtn:SetScript("OnClick", function()
         end
     end
 
+    local custom = customBox:GetText()
+    if not custom or custom == "" then
+        custom = "ВРЕМЯ ВЫШЛО!"
+    end
+
     print(string.format("|cFF00FF00[Будильник] Заведён на %d %s.|r", value, WoWbudilnikDB.unit == 1 and "мин." or "ч."))
     frame:Hide()
-    DelayedCall(seconds, AlarmTriggered)
+    DelayedCall(seconds, function() AlarmTriggered(custom) end)
 end)
 
 -- =======================================================
