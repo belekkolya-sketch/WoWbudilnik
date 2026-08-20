@@ -1,14 +1,13 @@
--- WoWbudilnik/core.lua — полный, по ТЗ
+-- WoWbudilnik/core.lua — рабочая версия для 3.3.5
 
 if not WoWbudilnikDB then
-    WoWbudilnikDB = { x = 0, y = 0, sound = 1, mode = 1 }
+    WoWbudilnikDB = { x = 0, y = 0, sound = 1, mode = 1, unit = 1 }
 end
 
 local ICON_PATH = "Interface\\Icons\\INV_Misc_PocketWatch_01"
-local MAX_MINUTES = 600 -- максимум 600 минут или 10 часов
 
 -- =======================================================
--- ПРОСТОЙ ТАЙМЕР ДЛЯ 3.3.5
+-- ТАЙМЕР ДЛЯ 3.3.5
 -- =======================================================
 local function DelayedCall(delay, func)
     local elapsed = 0
@@ -40,10 +39,10 @@ local function AlarmTriggered()
 end
 
 -- =======================================================
--- ОКНО БУДИЛЬНИКА
+-- ОКНО
 -- =======================================================
 local frame = CreateFrame("Frame", "WoWBudilnikFrame", UIParent)
-frame:SetSize(280, 250)
+frame:SetSize(300, 260)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("DIALOG")
 frame:SetMovable(true)
@@ -71,37 +70,44 @@ local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 title:SetPoint("TOP", 0, -16)
 title:SetText("Будильник")
 
--- Текст про выбор времени
+-- Единицы времени
 local timeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
 timeLabel:SetPoint("TOPLEFT", 16, -46)
 timeLabel:SetText("Выберите единицу времени:")
 
--- Дропдаун единиц
 local unitBox = CreateFrame("Button", "WoWBudilnikUnitBox", frame, "UIDropDownMenuTemplate")
 unitBox:SetPoint("TOPLEFT", timeLabel, "BOTTOMLEFT", 0, -5)
+
 UIDropDownMenu_Initialize(unitBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
     info.text = "Минуты"
-    info.func = function() WoWbudilnikDB.unit = 1; UIDropDownMenu_SetText(unitBox, "Минуты") end
+    info.func = function()
+        WoWbudilnikDB.unit = 1
+        UIDropDownMenu_SetSelectedValue(unitBox, "Минуты")
+    end
     UIDropDownMenu_AddButton(info)
 
     info = UIDropDownMenu_CreateInfo()
     info.text = "Часы"
-    info.func = function() WoWbudilnikDB.unit = 2; UIDropDownMenu_SetText(unitBox, "Часы") end
+    info.func = function()
+        WoWbudilnikDB.unit = 2
+        UIDropDownMenu_SetSelectedValue(unitBox, "Часы")
+    end
     UIDropDownMenu_AddButton(info)
 end)
 UIDropDownMenu_SetWidth(unitBox, 100)
-UIDropDownMenu_SetText(unitBox, "Минуты")
-WoWbudilnikDB.unit = 1
+UIDropDownMenu_SetSelectedValue(unitBox, "Минуты")
 
 -- Поле ввода
+local inputLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
+inputLabel:SetPoint("TOPLEFT", unitBox, "TOPRIGHT", 16, -8)
+inputLabel:SetText("Время:")
+
 local inputBox = CreateFrame("EditBox", "WoWBudilnikInput", frame, "InputBoxTemplate")
 inputBox:SetSize(80, 24)
-inputBox:SetPoint("TOPLEFT", unitBox, "TOPRIGHT", 12, -2)
+inputBox:SetPoint("TOPLEFT", inputLabel, "TOPRIGHT", 6, -2)
 inputBox:SetAutoFocus(false)
 inputBox:SetText("60")
-
-_G[inputBox:GetName() .. "Text"]:SetText("Время:")
 
 -- Подсказка
 local limitText = frame:CreateFontString(nil, "OVERLAY", "GameFontWhiteSmall")
@@ -110,7 +116,7 @@ limitText:SetText("(Максимум 600 минут или 10 часов)")
 
 -- Тип оповещения
 local modeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-modeLabel:SetPoint("TOPLEFT", limitText, "BOTTOMLEFT", 0, -8)
+modeLabel:SetPoint("TOPLEFT", limitText, "BOTTOMLEFT", 0, -10)
 modeLabel:SetText("Тип оповещения:")
 
 local modeBox = CreateFrame("Button", "WoWBudilnikModeBox", frame, "UIDropDownMenuTemplate")
@@ -119,22 +125,26 @@ modeBox:SetPoint("TOPLEFT", modeLabel, "BOTTOMLEFT", 0, -5)
 UIDropDownMenu_Initialize(modeBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
     info.text = "В чат"
-    info.func = function() WoWbudilnikDB.mode = 1; UIDropDownMenu_SetText(modeBox, "В чат") end
+    info.func = function()
+        WoWbudilnikDB.mode = 1
+        UIDropDownMenu_SetSelectedValue(modeBox, "В чат")
+    end
     UIDropDownMenu_AddButton(info)
 
     info = UIDropDownMenu_CreateInfo()
     info.text = "Объявление рейду"
-    info.func = function() WoWbudilnikDB.mode = 2; UIDropDownMenu_SetText(modeBox, "Объявление рейду") end
+    info.func = function()
+        WoWbudilnikDB.mode = 2
+        UIDropDownMenu_SetSelectedValue(modeBox, "Объявление рейду")
+    end
     UIDropDownMenu_AddButton(info)
 end)
-
-UIDropDownMenu_SetWidth(modeBox, 150)
-UIDropDownMenu_SetText(modeBox, "В чат")
-WoWbudilnikDB.mode = 1
+UIDropDownMenu_SetWidth(modeBox, 160)
+UIDropDownMenu_SetSelectedValue(modeBox, "В чат")
 
 -- Звук
 local soundLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-soundLabel:SetPoint("TOPLEFT", modeBox, "BOTTOMLEFT", 0, -8)
+soundLabel:SetPoint("TOPLEFT", modeBox, "BOTTOMLEFT", 0, -10)
 soundLabel:SetText("Звук оповещения:")
 
 local soundBox = CreateFrame("Button", "WoWBudilnikSoundBox", frame, "UIDropDownMenuTemplate")
@@ -143,18 +153,22 @@ soundBox:SetPoint("TOPLEFT", soundLabel, "BOTTOMLEFT", 0, -5)
 UIDropDownMenu_Initialize(soundBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
     info.text = "Стандартный звук"
-    info.func = function() WoWbudilnikDB.sound = 1; UIDropDownMenu_SetText(soundBox, "Стандартный звук") end
+    info.func = function()
+        WoWbudilnikDB.sound = 1
+        UIDropDownMenu_SetSelectedValue(soundBox, "Стандартный звук")
+    end
     UIDropDownMenu_AddButton(info)
 
     info = UIDropDownMenu_CreateInfo()
     info.text = "Звук битвы"
-    info.func = function() WoWbudilnikDB.sound = 2; UIDropDownMenu_SetText(soundBox, "Звук битвы") end
+    info.func = function()
+        WoWbudilnikDB.sound = 2
+        UIDropDownMenu_SetSelectedValue(soundBox, "Звук битвы")
+    end
     UIDropDownMenu_AddButton(info)
 end)
-
-UIDropDownMenu_SetWidth(soundBox, 150)
-UIDropDownMenu_SetText(soundBox, "Стандартный звук")
-WoWbudilnikDB.sound = 1
+UIDropDownMenu_SetWidth(soundBox, 160)
+UIDropDownMenu_SetSelectedValue(soundBox, "Стандартный звук")
 
 -- Кнопка "Завести"
 local startBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
@@ -213,18 +227,10 @@ btn:SetScript("OnDragStop", function(self)
 end)
 
 btn:SetScript("OnClick", function(self, button)
-    if button == "LeftButton" then
-        if frame:IsShown() then
-            frame:Hide()
-        else
-            frame:Show()
-        end
-    elseif button == "RightButton" then
-        if frame:IsShown() then
-            frame:Hide()
-        else
-            frame:Show()
-        end
+    if frame:IsShown() then
+        frame:Hide()
+    else
+        frame:Show()
     end
 end)
 
