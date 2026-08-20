@@ -1,7 +1,9 @@
 ## Interface: 30300
 ## Title: WoWbudilnik
-## Notes: Простой независимый будильник поверх любых UI-модов.
+## Notes: Простой будильник. Минуты/часы, чат/рейд, два звука.
 ## Author: Sinemoska
-## Version: 0.1
+## Version: 2.0
+
+## X-Sirus-Update https://github.com/belekkolya-sketch/WoWbudilnik/tree/main
 
 core.lua
