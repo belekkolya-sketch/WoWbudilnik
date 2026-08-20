@@ -151,11 +151,11 @@ UIDropDownMenu_SetSelectedValue(modeBox, "В чат")
 
 -- Звук
 local soundLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-soundLabel:SetPoint("TOPLEFT", modeBox, "BOTTOMLEFT", 0, -8)
+soundLabel:SetPoint("TOPLEFT", modeBox, "BOTTOMLEFT", 12, -8)
 soundLabel:SetText("Звук оповещения:")
 
 local soundBox = CreateFrame("Button", "WoWBudilnikSoundBox", frame, "UIDropDownMenuTemplate")
-soundBox:SetPoint("TOPLEFT", soundLabel, "BOTTOMLEFT", -10, -5)
+soundBox:SetPoint("TOPLEFT", soundLabel, "BOTTOMLEFT", -12, -5)
 
 UIDropDownMenu_Initialize(soundBox, function(self)
     local info = UIDropDownMenu_CreateInfo()
@@ -179,7 +179,7 @@ UIDropDownMenu_SetSelectedValue(soundBox, "Стандартный звук")
 
 -- Поле своего текста
 local customLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 10, -12)
+customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 14, -12)
 customLabel:SetText("Текст при звонке:")
 
 local customBox = CreateFrame("EditBox", "WoWBudilnikCustomText", frame, "InputBoxTemplate")
