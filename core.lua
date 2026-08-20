@@ -179,11 +179,11 @@ UIDropDownMenu_SetSelectedValue(soundBox, "Стандартный звук")
 
 -- Поле своего текста
 local customLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 0, -12)
+customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 10, -12)
 customLabel:SetText("Текст при звонке:")
 
 local customBox = CreateFrame("EditBox", "WoWBudilnikCustomText", frame, "InputBoxTemplate")
-customBox:SetSize(220, 24)
+customBox:SetSize(200, 24)
 customBox:SetPoint("TOPLEFT", customLabel, "BOTTOMLEFT", 0, -5)
 customBox:SetAutoFocus(false)
 customBox:SetText("Проснись!")
