@@ -1,4 +1,4 @@
--- WoWbudilnik/core.lua — финальная версия с графикой, Esc и своим текстом
+-- WoWbudilnik/core.lua — финальная версия для Сируса 3.3.5
 
 if not WoWbudilnikDB then
     WoWbudilnikDB = { x = 0, y = 0, sound = 1, mode = 1, unit = 1 }
@@ -46,7 +46,7 @@ end
 -- ОКНО
 -- =======================================================
 local frame = CreateFrame("Frame", "WoWBudilnikFrame", UIParent)
-frame:SetSize(320, 300)
+frame:SetSize(340, 370)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("DIALOG")
 frame:SetMovable(true)
@@ -79,7 +79,7 @@ title:SetText("Будильник")
 
 -- Единицы времени
 local timeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-timeLabel:SetPoint("TOPLEFT", 20, -50)
+timeLabel:SetPoint("TOPLEFT", 20, -48)
 timeLabel:SetText("Единицы:")
 
 local unitBox = CreateFrame("Button", "WoWBudilnikUnitBox", frame, "UIDropDownMenuTemplate")
@@ -179,11 +179,11 @@ UIDropDownMenu_SetSelectedValue(soundBox, "Стандартный звук")
 
 -- Поле своего текста
 local customLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontWhite")
-customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 0, -10)
+customLabel:SetPoint("TOPLEFT", soundBox, "BOTTOMLEFT", 0, -12)
 customLabel:SetText("Текст при звонке:")
 
 local customBox = CreateFrame("EditBox", "WoWBudilnikCustomText", frame, "InputBoxTemplate")
-customBox:SetSize(180, 24)
+customBox:SetSize(220, 24)
 customBox:SetPoint("TOPLEFT", customLabel, "BOTTOMLEFT", 0, -5)
 customBox:SetAutoFocus(false)
 customBox:SetText("Проснись!")
@@ -191,7 +191,7 @@ customBox:SetText("Проснись!")
 -- Кнопка "Завести"
 local startBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 startBtn:SetSize(120, 24)
-startBtn:SetPoint("BOTTOM", 0, 12)
+startBtn:SetPoint("BOTTOM", 0, 16)
 startBtn:SetText("Завести")
 
 startBtn:SetScript("OnClick", function()
